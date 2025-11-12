@@ -519,14 +519,6 @@ Las contribuciones son bienvenidas. Por favor:
 
 Este proyecto está licenciado bajo la Licencia MIT - Ver el archivo `LICENSE` para más detalles.
 
-### ✉️ Contacto y Soporte
-
-- **Autor:** [Tu nombre]
-- **Email:** [tu.email@ejemplo.com]
-- **Materia:** Sistemas Operativos
-- **Universidad:** [Tu Universidad]
-- **Período:** Noviembre 2024 - Diciembre 2024
-
 ---
 
 ## Português
@@ -684,13 +676,6 @@ Veja a tabela comparativa na seção em espanhol para uma análise completa do d
 ### 📄 Licença
 
 Este projeto está licenciado sob a Licença MIT.
-
-### ✉️ Contato
-
-- **Autor:** [Seu nome]
-- **Email:** [seu.email@exemplo.com]
-- **Disciplina:** Sistemas Operacionais
-- **Período:** Novembro 2024 - Dezembro 2024
 
 ---
 
