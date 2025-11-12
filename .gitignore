@@ -1,0 +1,51 @@
+# Compiled Java files
+*.class
+*.jar
+*.war
+*.ear
+
+# Build directories
+bin/
+build/
+dist/
+target/
+
+# IDE specific files
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Gradle/Maven
+.gradle/
+.m2/
+*.gradle
+
+# Local environment files
+.env
+.env.local
+*.properties
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+temp/
+resultados/*.txt
+resultados/*.log
+resultados/metricas_*/
