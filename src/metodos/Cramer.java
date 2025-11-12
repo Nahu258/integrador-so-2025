@@ -56,7 +56,6 @@ public class Cramer implements MetodoResolucion {
         double[][] A = circuito.getCoeficientes();
         double[] b = circuito.getTerminosIndep();
         
-        // Calcular determinante de A
         double detA = calcularDeterminante(A);
         
         if (Math.abs(detA) < 1e-10) {
@@ -65,15 +64,12 @@ public class Cramer implements MetodoResolucion {
         
         double[] x = new double[n];
         
-        // Para cada incógnita xi
         for (int i = 0; i < n; i++) {
-            // Crear matriz Ai reemplazando columna i con vector b
             double[][] Ai = copiarMatriz(A);
             for (int j = 0; j < n; j++) {
                 Ai[j][i] = b[j];
             }
             
-            // xi = det(Ai) / det(A)
             double detAi = calcularDeterminante(Ai);
             x[i] = detAi / detA;
         }
@@ -88,17 +84,14 @@ public class Cramer implements MetodoResolucion {
     private double calcularDeterminante(double[][] matriz) {
         int n = matriz.length;
         
-        // Caso base: matriz 1x1
         if (n == 1) {
             return matriz[0][0];
         }
         
-        // Caso base: matriz 2x2
         if (n == 2) {
             return matriz[0][0] * matriz[1][1] - matriz[0][1] * matriz[1][0];
         }
         
-        // Expansión por primera fila
         double det = 0;
         for (int j = 0; j < n; j++) {
             double[][] submatriz = obtenerSubmatriz(matriz, 0, j);

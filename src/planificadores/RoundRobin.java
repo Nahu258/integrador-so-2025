@@ -57,13 +57,12 @@ public class RoundRobin implements Planificador {
         long sumaEspera = 0;
         long sumaRespuesta = 0;
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        // Crear executor con thread por tarea (mejor control)
+        ExecutorService executor = Executors.newCachedThreadPool();
         
-        // Ejecutar mientras haya tareas pendientes
         while (!colaTareas.isEmpty()) {
             TareaRR tarea = colaTareas.poll();
             
-            // Si es la primera vez que se ejecuta
             if (!tarea.haIniciado()) {
                 tarea.setTiempoInicio(System.currentTimeMillis());
                 System.out.println("[RoundRobin] Primera ejecución de: " + tarea);
@@ -73,47 +72,59 @@ public class RoundRobin implements Planificador {
             }
             
             try {
-                // Ejecutar durante un quantum
                 Future<?> future = executor.submit(tarea.getMetodo());
                 
                 try {
-                    // Esperar el quantum o hasta que termine
+                    // Esperar con timeout
                     future.get(quantum, TimeUnit.MILLISECONDS);
                     
-                    // Si llegó aquí, terminó antes del quantum
+                    // Terminó antes del quantum
                     tarea.marcarCompletada();
                     tarea.setTiempoFin(System.currentTimeMillis());
                     
-                    System.out.println("[RoundRobin] ✓ Tarea completada: " + tarea);
-                    System.out.println("       - Tiempo total: " + tarea.getMetodo().getTiempoEjecucion() + " ms");
-                    System.out.println("       - Quantums usados: " + tarea.getQuantumsUsados());
+                    System.out.println("[RoundRobin] ✓ Completada: " + tarea);
+                    System.out.println("       - Tiempo: " + tarea.getMetodo().getTiempoEjecucion() + " ms");
+                    System.out.println("       - Quantums: " + tarea.getQuantumsUsados());
                     
-                    // Acumular métricas
                     sumaEspera += tarea.getTiempoEspera();
                     sumaRespuesta += tarea.getTiempoRespuesta();
                     tareasCompletadas++;
                     
                 } catch (TimeoutException e) {
-                    // Se agotó el quantum, reencolar
+                    // ✓ MEJORADO: Cancelar el future
+                    boolean cancelado = future.cancel(true);  // true = interrumpir
+                    
+                    if (cancelado) {
+                        System.out.println("[RoundRobin] ⏱ Quantum agotado, interrumpida");
+                    } else {
+                        System.out.println("[RoundRobin] ⚠ No se pudo interrumpir (en punto no-cancelable)");
+                    }
+                    
                     tarea.incrementarQuantums();
-                    colaTareas.offer(tarea);
                     
-                    System.out.println("[RoundRobin] Quantum agotado, reencolando: " + tarea);
-                    System.out.println("       - Quantums usados: " + tarea.getQuantumsUsados());
-                    
-                    // No cancelar el future, dejar que la tarea siga en background
-                    // NOTA: En implementación real, necesitarías mecanismo para pausar/reanudar
+                    // Límite de quantums (evitar loop infinito)
+                    if (tarea.getQuantumsUsados() > 10) {
+                        System.out.println("[RoundRobin] ✗ Máximo de quantums excedido, descartando");
+                        tareasCompletadas++;
+                    } else {
+                        colaTareas.offer(tarea);
+                        System.out.println("[RoundRobin] Reencolada (quantum " + tarea.getQuantumsUsados() + ")");
+                    }
                 }
                 
-            } catch (InterruptedException | ExecutionException e) {
-                System.err.println("[RoundRobin] Error ejecutando tarea: " + e.getMessage());
+            } catch (InterruptedException e) {
+                System.err.println("[RoundRobin] Interrumpida: " + e.getMessage());
+                Thread.currentThread().interrupt();
+                tareasCompletadas++;
+            } catch (ExecutionException e) {
+                System.err.println("[RoundRobin] Error: " + e.getMessage());
                 tareasCompletadas++;
             }
             
             System.out.println();
         }
         
-        executor.shutdown();
+        executor.shutdownNow();  // Fuerza cierre de threads pendientes
         
         // Calcular métricas finales
         long tiempoFinTotal = System.currentTimeMillis();

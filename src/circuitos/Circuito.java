@@ -70,7 +70,7 @@ public class Circuito {
     }
     
     /**
-     * CIRCUITO COMPLEJO: 9 mallas (antes 6)
+     * CIRCUITO COMPLEJO: 9 mallas (antes 9)
      * Este tardará MUCHO más, especialmente con Cramer
      */
     public static Circuito generarCircuitoComplejo() {
